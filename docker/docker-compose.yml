@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: medimageops_postgres
+    environment:
+      POSTGRES_USER: meduser
+      POSTGRES_PASSWORD: medpassword
+      POSTGRES_DB: medimageops
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  airflow:
+    image: apache/airflow:2.10.5-python3.11
+    container_name: medimageops_airflow
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////opt/airflow/airflow.db
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      DATABASE_URL: postgresql+psycopg2://meduser:medpassword@medimageops_postgres:5432/medimageops
+      S3_BUCKET: medimageops-mehul-bisht
+      S3_PREFIX: medimageops/raw/dicom
+      AWS_DEFAULT_REGION: us-east-2
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../airflow/dags:/opt/airflow/dags
+      - ../src:/opt/airflow/src
+      - ../data:/opt/airflow/data
+      - ../airflow/requirements-airflow.txt:/opt/airflow/requirements-airflow.txt
+      - ~/.aws:/home/airflow/.aws:ro
+    command: >
+      bash -c "
+      pip install -r /opt/airflow/requirements-airflow.txt &&
+      airflow db migrate &&
+      airflow users create
+      --username admin
+      --password admin
+      --firstname Mehul
+      --lastname Bisht
+      --role Admin
+      --email admin@example.com || true &&
+      airflow standalone
+      "
+
+volumes:
+  postgres_data:

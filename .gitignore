@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+.env
+
+# Mac
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+
+# AWS
+.aws/
+
+# Airflow
+airflow/logs/
+airflow/*.db
+
+# Data
+data/raw/
+data/processed/
+data/reports/
+
+# Vector DB
+*.bin
+*.index
+*.faiss
+
+# Database
+*.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
